@@ -816,7 +816,7 @@ GameObject:
   - component: {fileID: 1341868494}
   - component: {fileID: 1341868496}
   m_Layer: 0
-  m_Name: Square
+  m_Name: PlayerFloor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1275,6 +1275,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1023726770}
     - target: {fileID: 5505132054779105999, guid: 77de344f547cfe348870a5d674e75dd7, type: 3}
+      propertyPath: playerFloor
+      value: 
+      objectReference: {fileID: 1341868493}
+    - target: {fileID: 5505132054779105999, guid: 77de344f547cfe348870a5d674e75dd7, type: 3}
       propertyPath: dodgeballScript
       value: 
       objectReference: {fileID: 1023726774}
@@ -1344,10 +1348,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7722048135771035666, guid: 534ca92af1430b24489d663aa8c577fd, type: 3}
       propertyPath: m_Name
-      value: Dodgeball
-      objectReference: {fileID: 0}
-    - target: {fileID: 7722048135771035666, guid: 534ca92af1430b24489d663aa8c577fd, type: 3}
-      propertyPath: m_TagString
       value: Dodgeball
       objectReference: {fileID: 0}
     m_RemovedComponents: []

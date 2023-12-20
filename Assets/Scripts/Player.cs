@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
     public Dodgeball dodgeballScript;
+    public GameObject playerFloor;
 
     private Vector2 moveInput;
     private PlayerControls controls;
@@ -34,7 +35,19 @@ public class Player : MonoBehaviour
     void Update()
     {
         Vector3 movement = new Vector3(moveInput.x, moveInput.y, 0);
-        transform.position += movement * moveSpeed * Time.deltaTime;
+        Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
+
+
+                // Get the bounds of playerFloor
+        Bounds floorBounds = playerFloor.GetComponent<BoxCollider2D>().bounds;
+
+        // Check if the new position is within the bounds
+        newPosition.x = Mathf.Clamp(newPosition.x, floorBounds.min.x, floorBounds.max.x);
+        newPosition.y = Mathf.Clamp(newPosition.y, floorBounds.min.y, floorBounds.max.y);
+
+        // Apply the adjusted position
+        transform.position = newPosition;
+
     }
 
 void OnTriggerEnter2D(Collider2D other)
