@@ -6,6 +6,10 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
+    public float throwForce = 10.0f;
+
+    public float catchRadius = 2.0f;
+
     public Dodgeball dodgeballScript;
     public GameObject playerFloor;
 
@@ -20,6 +24,8 @@ public class Player : MonoBehaviour
         controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         controls.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Throw.performed += ctx => ThrowBall();
+        controls.Player.Catch.performed += ctx => CatchBall();
+
     }
 
     void OnEnable()
@@ -48,6 +54,7 @@ public class Player : MonoBehaviour
         // Apply the adjusted position
         transform.position = newPosition;
 
+        CheckForThrownBalls();
     }
 
 void OnTriggerEnter2D(Collider2D other)
@@ -60,12 +67,62 @@ void OnTriggerEnter2D(Collider2D other)
     }
 }
 
-    void ThrowBall()
+
+    private void ThrowBall()
     {
-        if (isHoldingBall)
+        if (dodgeballScript != null)
         {
-            dodgeballScript.Throw(new Vector2(moveInput.x, moveInput.y));
+            Vector2 direction = transform.right;
+
+            dodgeballScript.Throw(direction, throwForce);
             isHoldingBall = false;
         }
     }
+    private void CatchBall()
+    {
+        if (!isHoldingBall)
+        {
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, catchRadius);
+            foreach (Collider2D collider in colliders)
+            {
+                Dodgeball dodgeball = collider.GetComponent<Dodgeball>();
+                if (dodgeball != null && !dodgeball.isOnFloor)
+                {
+                    dodgeballScript = dodgeball;
+                    dodgeballScript.PickUp(transform);
+                    isHoldingBall = true;
+                    break;
+                }
+            }
+        }
+    }
+
+private void CheckForThrownBalls()
+{
+    if (!isHoldingBall)
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, catchRadius);
+        foreach (Collider2D collider in colliders)
+        {
+            Dodgeball dodgeball = collider.GetComponent<Dodgeball>();
+            if (dodgeball != null && !dodgeball.isOnFloor && dodgeball.ThrownBy != gameObject)
+            {
+                Die();
+                break;
+            }
+        }
+    }
+}
+
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    void OnDrawGizmosSelected()
+{
+    // Draw a yellow sphere at the player's position with a radius of catchRadius
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireSphere(transform.position, catchRadius);
+}
 }
