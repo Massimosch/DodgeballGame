@@ -6,16 +6,11 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
-    public float throwForce = 10.0f;
-
-    public float catchRadius = 2.0f;
-
-    public Dodgeball dodgeballScript;
+    public float throwForce = 10f;
+    public Dodgeball dodgeball;
     public GameObject playerFloor;
-
     private Vector2 moveInput;
     private PlayerControls controls;
-    private bool isHoldingBall = false;
 
     private void Awake()
     {
@@ -24,7 +19,7 @@ public class Player : MonoBehaviour
         controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         controls.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Throw.performed += ctx => ThrowBall();
-        controls.Player.Catch.performed += ctx => CatchBall();
+    //    controls.Player.Catch.performed += ctx => CatchBall();
 
     }
 
@@ -38,91 +33,39 @@ public class Player : MonoBehaviour
         controls.Disable();
     }
 
+
     void Update()
     {
         Vector3 movement = new Vector3(moveInput.x, moveInput.y, 0);
         Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
 
 
-                // Get the bounds of playerFloor
+        // Get the bounds of playerFloor
         Bounds floorBounds = playerFloor.GetComponent<BoxCollider2D>().bounds;
 
         // Check if the new position is within the bounds
         newPosition.x = Mathf.Clamp(newPosition.x, floorBounds.min.x, floorBounds.max.x);
         newPosition.y = Mathf.Clamp(newPosition.y, floorBounds.min.y, floorBounds.max.y);
 
-        // Apply the adjusted position
         transform.position = newPosition;
-
-        CheckForThrownBalls();
     }
 
-void OnTriggerEnter2D(Collider2D other)
+    void OnTriggerEnter2D(Collider2D other)
 {
-    if (other.gameObject.CompareTag("Dodgeball") && !isHoldingBall)
+    if (other.gameObject.CompareTag("Dodgeball"))
     {
-        dodgeballScript = other.gameObject.GetComponent<Dodgeball>();
-        isHoldingBall = true;
-        dodgeballScript.PickUp(transform);
+        dodgeball = other.gameObject.GetComponent<Dodgeball>();
     }
 }
 
-
-    private void ThrowBall()
+    public void ThrowBall()
     {
-        if (dodgeballScript != null)
-        {
-            Vector2 direction = transform.right;
-
-            dodgeballScript.Throw(direction, throwForce);
-            isHoldingBall = false;
-        }
+    Vector2 direction = new Vector2(1, 0); // Positive x direction
+    dodgeball.Throw(direction, throwForce);
     }
-    private void CatchBall()
-    {
-        if (!isHoldingBall)
-        {
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, catchRadius);
-            foreach (Collider2D collider in colliders)
-            {
-                Dodgeball dodgeball = collider.GetComponent<Dodgeball>();
-                if (dodgeball != null && !dodgeball.isOnFloor)
-                {
-                    dodgeballScript = dodgeball;
-                    dodgeballScript.PickUp(transform);
-                    isHoldingBall = true;
-                    break;
-                }
-            }
-        }
-    }
-
-private void CheckForThrownBalls()
-{
-    if (!isHoldingBall)
-    {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, catchRadius);
-        foreach (Collider2D collider in colliders)
-        {
-            Dodgeball dodgeball = collider.GetComponent<Dodgeball>();
-            if (dodgeball != null && !dodgeball.isOnFloor && dodgeball.ThrownBy != gameObject)
-            {
-                Die();
-                break;
-            }
-        }
-    }
-}
 
     private void Die()
     {
         Destroy(gameObject);
     }
-
-    void OnDrawGizmosSelected()
-{
-    // Draw a yellow sphere at the player's position with a radius of catchRadius
-    Gizmos.color = Color.yellow;
-    Gizmos.DrawWireSphere(transform.position, catchRadius);
-}
 }
