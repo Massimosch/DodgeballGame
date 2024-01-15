@@ -4,29 +4,28 @@ using UnityEngine;
 
 public class Dodgeball : MonoBehaviour
 {
-
     private Rigidbody2D rb;
+    private DodgeballDamage damageScript;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        damageScript = GetComponent<DodgeballDamage>();
+        damageScript.enabled = false;
     }
 
-    void Update()
+    public void Throw(Vector2 direction, float force, GameObject thrower)
     {
-        
-    }
-
-    public void Throw(Vector2 direction, float force)
-    {
+        damageScript.SetThrower(thrower);
+        damageScript.enabled = true;
         rb.AddForce(direction * force, ForceMode2D.Impulse);
     }
 
-        void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Wall") || collision.gameObject.CompareTag("Player") || collision.gameObject.CompareTag("Enemy"))
         {
-            Destroy(collision.gameObject);
+            damageScript.HandleCollision(collision.gameObject);
         }
     }
 }

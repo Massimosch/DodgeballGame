@@ -7,10 +7,11 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 10.0f;
     public float throwForce = 10f;
-    public Dodgeball dodgeball;
+    public Dodgeball dodgeballPrefab;
     public GameObject playerFloor;
     private Vector2 moveInput;
     private PlayerControls controls;
+    private Dodgeball currentDodgeball;
 
     private void Awake()
     {
@@ -19,8 +20,6 @@ public class Player : MonoBehaviour
         controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         controls.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Throw.performed += ctx => ThrowBall();
-    //    controls.Player.Catch.performed += ctx => CatchBall();
-
     }
 
     void OnEnable()
@@ -33,12 +32,10 @@ public class Player : MonoBehaviour
         controls.Disable();
     }
 
-
     void Update()
     {
         Vector3 movement = new Vector3(moveInput.x, moveInput.y, 0);
         Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
-
 
         // Get the bounds of playerFloor
         Bounds floorBounds = playerFloor.GetComponent<BoxCollider2D>().bounds;
@@ -50,21 +47,27 @@ public class Player : MonoBehaviour
         transform.position = newPosition;
     }
 
-    void OnTriggerEnter2D(Collider2D other)
-{
-    if (other.gameObject.CompareTag("Dodgeball"))
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        dodgeball = other.gameObject.GetComponent<Dodgeball>();
+        if (collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
+        {
+            currentDodgeball = collision.gameObject.GetComponent<Dodgeball>();
+            currentDodgeball.transform.SetParent(transform);
+        }
     }
-}
+
 
     public void ThrowBall()
     {
-    Vector2 direction = new Vector2(1, 0); // Positive x direction
-    dodgeball.Throw(direction, throwForce);
+    if (currentDodgeball != null)
+        {
+            currentDodgeball.transform.SetParent(null);
+            Vector2 throwDirection = new Vector2(0, 1);
+            currentDodgeball.Throw(throwDirection, throwForce, gameObject); // Tässä lisätty 'gameObject'
+            currentDodgeball = null;
+        }
     }
-
-    private void Die()
+    void Die()
     {
         Destroy(gameObject);
     }
