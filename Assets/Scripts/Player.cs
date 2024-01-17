@@ -69,6 +69,7 @@ public class Player : MonoBehaviour
         }
     }
 
+
     void Die()
     {
         Destroy(gameObject);

@@ -12,8 +12,6 @@ public class Dodgeball : MonoBehaviour
         damageScript = GetComponent<DodgeballDamage>();
         damageScript.enabled = false;
 
-        GameObject dodgeballMesh = GameObject.Find("DodgeballMesh");
-        rb = dodgeballMesh.GetComponent<Rigidbody2D>();
     }
 
     public void Throw(Vector2 direction, float force, GameObject thrower)
