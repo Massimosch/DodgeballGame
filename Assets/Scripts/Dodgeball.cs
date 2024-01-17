@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class Dodgeball : MonoBehaviour
 {
-    private Rigidbody2D rb;
     private DodgeballDamage damageScript;
+    [SerializeField] Rigidbody2D rb;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         damageScript = GetComponent<DodgeballDamage>();
         damageScript.enabled = false;
+
+        GameObject dodgeballMesh = GameObject.Find("DodgeballMesh");
+        rb = dodgeballMesh.GetComponent<Rigidbody2D>();
     }
 
     public void Throw(Vector2 direction, float force, GameObject thrower)

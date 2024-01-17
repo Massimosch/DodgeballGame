@@ -12,6 +12,8 @@ public class Player : MonoBehaviour
     private Vector2 moveInput;
     private PlayerControls controls;
     private Dodgeball currentDodgeball;
+    private Vector2 throwDirection = Vector2.zero;
+
 
     private void Awake()
     {
@@ -56,8 +58,22 @@ public class Player : MonoBehaviour
         }
     }
 
-
     public void ThrowBall()
+    {
+    if (currentDodgeball != null)
+    {
+        currentDodgeball.transform.SetParent(null);
+        if (throwDirection == Vector2.zero)
+        {
+            throwDirection = new Vector2(0, 1); // Replace this with your original calculation
+        }
+        currentDodgeball.Throw(throwDirection, throwForce, gameObject);
+        currentDodgeball = null;
+    }
+    }
+
+
+    /*public void ThrowBall()
     {
     if (currentDodgeball != null)
         {
@@ -67,6 +83,7 @@ public class Player : MonoBehaviour
             currentDodgeball = null;
         }
     }
+    */
     void Die()
     {
         Destroy(gameObject);
