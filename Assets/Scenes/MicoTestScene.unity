@@ -1194,10 +1194,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1806972035196043572, guid: 8f47ca8f7903f8f4fac4e18be6cf75ec, type: 3}
-      propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2880937315221836669, guid: 8f47ca8f7903f8f4fac4e18be6cf75ec, type: 3}
       propertyPath: outOfGamePosition
       value: 
@@ -1271,14 +1267,6 @@ PrefabInstance:
       propertyPath: dodgeballPrefab
       value: 
       objectReference: {fileID: 1383569403}
-    - target: {fileID: 2351043648362398209, guid: 438166bccc5b4914c9723e6cf76a4b57, type: 3}
-      propertyPath: m_IsTrigger
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2351043648362398209, guid: 438166bccc5b4914c9723e6cf76a4b57, type: 3}
-      propertyPath: m_UsedByEffector
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3669591055864651151, guid: 438166bccc5b4914c9723e6cf76a4b57, type: 3}
       propertyPath: m_RootOrder
       value: 5

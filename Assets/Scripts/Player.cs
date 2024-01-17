@@ -61,21 +61,6 @@ public class Player : MonoBehaviour
     public void ThrowBall()
     {
     if (currentDodgeball != null)
-    {
-        currentDodgeball.transform.SetParent(null);
-        if (throwDirection == Vector2.zero)
-        {
-            throwDirection = new Vector2(0, 1); // Replace this with your original calculation
-        }
-        currentDodgeball.Throw(throwDirection, throwForce, gameObject);
-        currentDodgeball = null;
-    }
-    }
-
-
-    /*public void ThrowBall()
-    {
-    if (currentDodgeball != null)
         {
             currentDodgeball.transform.SetParent(null);
             Vector2 throwDirection = new Vector2(0, 1);
@@ -83,7 +68,7 @@ public class Player : MonoBehaviour
             currentDodgeball = null;
         }
     }
-    */
+
     void Die()
     {
         Destroy(gameObject);

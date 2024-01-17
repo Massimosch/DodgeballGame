@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6055323500167634334}
   - component: {fileID: 5605152465821132565}
   - component: {fileID: 3331550940731663759}
-  - component: {fileID: 1806972035196043572}
+  - component: {fileID: 7174522842285580834}
   m_Layer: 0
   m_Name: DodgeballMesh
   m_TagString: Dodgeball
@@ -113,7 +113,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!58 &1806972035196043572
+--- !u!58 &7174522842285580834
 CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -161,7 +161,7 @@ GameObject:
   - component: {fileID: 1512373576753868671}
   m_Layer: 0
   m_Name: Dodgeball
-  m_TagString: Untagged
+  m_TagString: Dodgeball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
