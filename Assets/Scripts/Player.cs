@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     private Dodgeball currentDodgeball;
     private Vector2 throwDirection = Vector2.zero;
 
+    private bool canPickBall = true;
+    private float pickBallDelay = 1.0f;
+
 
     private void Awake()
     {
@@ -49,26 +52,35 @@ public class Player : MonoBehaviour
         transform.position = newPosition;
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+void OnCollisionEnter2D(Collision2D collision)
+{
+    if (canPickBall && collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
     {
-        if (collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
-        {
-            currentDodgeball = collision.gameObject.GetComponent<Dodgeball>();
-            currentDodgeball.transform.SetParent(transform);
-        }
+        currentDodgeball = collision.gameObject.GetComponent<Dodgeball>();
+        currentDodgeball.transform.SetParent(transform);
     }
+}
+
 
     public void ThrowBall()
     {
-    if (currentDodgeball != null)
+        if (currentDodgeball != null)
         {
             currentDodgeball.transform.SetParent(null);
             Vector2 throwDirection = new Vector2(0, 1);
-            currentDodgeball.Throw(throwDirection, throwForce, gameObject); // Tässä lisätty 'gameObject'
+            currentDodgeball.Throw(throwDirection, throwForce, gameObject);
             currentDodgeball = null;
+
+            canPickBall = false;
+            StartCoroutine(EnablePickBallAfterDelay());
         }
     }
 
+    private IEnumerator EnablePickBallAfterDelay()
+    {
+    yield return new WaitForSeconds(pickBallDelay);
+    canPickBall = true;
+    }
 
     void Die()
     {

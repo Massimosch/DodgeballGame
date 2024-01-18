@@ -4,6 +4,7 @@ public class DodgeballDamage : MonoBehaviour
 {
     private GameObject thrower; // Säilytetään tieto siitä, kuka heitti pallon
     public Transform outOfGamePosition;
+    private static float yOffset = 0f;
 
     public void SetThrower(GameObject thrower)
     {
@@ -41,6 +42,9 @@ public class DodgeballDamage : MonoBehaviour
 
     void HandleEnemyHit(GameObject enemy)
     {
-        enemy.transform.position = outOfGamePosition.position;
+        Vector3 newPosition = outOfGamePosition.position;
+        newPosition.y -= yOffset;
+        enemy.transform.position = newPosition;
+        yOffset += 1.5f;
     }
 }
