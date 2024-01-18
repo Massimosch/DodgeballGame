@@ -25,6 +25,7 @@ public class Player : MonoBehaviour
         controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
         controls.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
         controls.Player.Throw.performed += ctx => ThrowBall();
+      //  controls.Player.OpenMenu.performed += ctx => OpenMenu();
     }
 
     void OnEnable()
@@ -75,6 +76,8 @@ void OnCollisionEnter2D(Collision2D collision)
             StartCoroutine(EnablePickBallAfterDelay());
         }
     }
+
+   // void OpenMenu()
 
     private IEnumerator EnablePickBallAfterDelay()
     {
