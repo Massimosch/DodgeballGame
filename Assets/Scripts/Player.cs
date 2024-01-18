@@ -67,7 +67,7 @@ void OnCollisionEnter2D(Collision2D collision)
         if (currentDodgeball != null)
         {
             currentDodgeball.transform.SetParent(null);
-            Vector2 throwDirection = new Vector2(0, 1);
+            Vector2 throwDirection = new Vector2(1, 0);
             currentDodgeball.Throw(throwDirection, throwForce, gameObject);
             currentDodgeball = null;
 
