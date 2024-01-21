@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4300847656854537530}
   - component: {fileID: 527695175221011850}
   - component: {fileID: 5505132054779105999}
+  - component: {fileID: -776206460449209224}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -98,3 +99,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  dodgeballScript: {fileID: 0}
+  playerFloor: {fileID: 0}
+--- !u!114 &-776206460449209224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8343531673827207996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eaba4ab44f2de648a4cfa9cba996d34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _clip: {fileID: 0}
