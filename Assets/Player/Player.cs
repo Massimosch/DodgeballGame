@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -10,10 +9,10 @@ public class Player : MonoBehaviour
     public float throwForce = 10f;
     public Dodgeball dodgeballPrefab;
     public GameObject playerFloor;
-    private Vector2 moveInput;
+    private Vector3 moveInput;
     private PlayerControls controls;
     private Dodgeball currentDodgeball;
-    private Vector2 throwDirection = Vector2.zero;
+    private Vector3 throwDirection;
     public Slider powerBar;
 
     private bool canPickBall = true;
@@ -26,11 +25,12 @@ public class Player : MonoBehaviour
     {
         controls = new PlayerControls();
 
-        controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        controls.Player.Movement.canceled += ctx => moveInput = Vector2.zero;
+    controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector3>();
         controls.Player.Throw.started += ctx => StartCharging();
         controls.Player.Throw.canceled += ctx => ThrowBall();
       //  controls.Player.OpenMenu.performed += ctx => OpenMenu();
+
+        transform.position = new Vector3(transform.position.x, 5, transform.position.z);
     }
 
     void OnEnable()
@@ -45,24 +45,26 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        Vector3 movement = new Vector3(moveInput.x, moveInput.y, 0);
+
+        Vector3 movement = new Vector3(moveInput.x, 0, moveInput.z);
         Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
 
-        // Haetaan floor objectin kulmat jotta pelaaja pysyy niiden sisässä
-        Bounds floorBounds = playerFloor.GetComponent<BoxCollider2D>().bounds;
+        // Get the corners of the floor object so the player stays within them
+        Bounds floorBounds = playerFloor.GetComponent<BoxCollider>().bounds;
 
-        // Checkkailaan Clampillä että x ja y positiot pysyy kulmien sisällä
+        // Use Clamp to ensure that the x and z positions stay within the corners
         newPosition.x = Mathf.Clamp(newPosition.x, floorBounds.min.x, floorBounds.max.x);
-        newPosition.y = Mathf.Clamp(newPosition.y, floorBounds.min.y, floorBounds.max.y);
+        newPosition.z = Mathf.Clamp(newPosition.z, floorBounds.min.z, floorBounds.max.z);
+
 
         transform.position = newPosition;
 
         if (isCharging)
         {
             // Nostetaan throwforcea ja clamp hoitaa sit 10-20 välillä forcea riippuu kauanko painetaan
-            throwForce = Mathf.Clamp(throwForce + Time.deltaTime * 10, 10, 20);
+            throwForce = Mathf.Clamp(throwForce + Time.deltaTime * 50, 50, 100);
 
-            float normalizedThrowForce = (throwForce - 10) / 10;
+            float normalizedThrowForce = (throwForce - 50) / 50;
             powerBar.value = throwForce;
             //Sliderin value on vaan yksi sain sen näin täyttymään suht kivasti ku jako floatiksi
             powerBar.value = normalizedThrowForce;
@@ -71,7 +73,7 @@ public class Player : MonoBehaviour
     }
 
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnCollisionEnter(Collision collision)
     {
     if (canPickBall && collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
     {
@@ -97,11 +99,10 @@ public class Player : MonoBehaviour
 
     public void ThrowBall()
     {
-        if (currentDodgeball != null)
+    if (currentDodgeball != null)
         {
             currentDodgeball.transform.SetParent(null);
-            Vector2 throwDirection = new Vector2(1, 0);
-            currentDodgeball.Throw(throwDirection, throwForce, gameObject);
+            currentDodgeball.Throw(new Vector3(0, 0.2f, -1), throwForce, gameObject);
             currentDodgeball = null;
 
             canPickBall = false;
