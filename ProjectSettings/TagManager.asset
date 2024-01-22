@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Dodgeball
+  - Enemy
+  - Wall
   layers:
   - Default
   - TransparentFX
