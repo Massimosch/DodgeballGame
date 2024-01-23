@@ -5,15 +5,18 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
-    public float moveSpeed = 10.0f;
-    public float throwForce = 10f;
+    [SerializeField] private GameObject gameFloor;
+    [SerializeField] private Slider powerBar;
+    [SerializeField] Rigidbody playerRigidbody;
+    [SerializeField] private GameObject outOfGame;
+    [SerializeField] private PlayerControls controls;
+    [SerializeField] private Vector3 startingPosition;
     public Dodgeball dodgeballPrefab;
-    public GameObject playerFloor;
-    private Vector3 moveInput;
-    private PlayerControls controls;
     private Dodgeball currentDodgeball;
+    private Vector3 moveInput;
     private Vector3 throwDirection;
-    public Slider powerBar;
+    public float throwForce = 10f;
+    public float moveSpeed = 10.0f;
 
     private bool canPickBall = true;
     private float pickBallDelay = 1.0f;
@@ -23,14 +26,22 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        controls = new PlayerControls();
+        Init();
 
-    controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector3>();
+        controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector3>();
         controls.Player.Throw.started += ctx => StartCharging();
         controls.Player.Throw.canceled += ctx => ThrowBall();
       //  controls.Player.OpenMenu.performed += ctx => OpenMenu();
+    }
 
-        transform.position = new Vector3(transform.position.x, 5, transform.position.z);
+    private void Init()
+    {
+        controls = new PlayerControls();
+        playerRigidbody = GetComponent<Rigidbody>();
+        gameFloor = GameObject.Find("Floor");
+        outOfGame = GameObject.Find("PlayerOutOfGamePos");
+        transform.position = startingPosition;
+        // gameManager = FindObjectOfType<GameManager>();
     }
 
     void OnEnable()
@@ -50,7 +61,7 @@ public class Player : MonoBehaviour
         Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
 
         // Get the corners of the floor object so the player stays within them
-        Bounds floorBounds = playerFloor.GetComponent<BoxCollider>().bounds;
+        Bounds floorBounds = gameFloor.GetComponent<BoxCollider>().bounds;
 
         // Use Clamp to ensure that the x and z positions stay within the corners
         newPosition.x = Mathf.Clamp(newPosition.x, floorBounds.min.x, floorBounds.max.x);
@@ -75,13 +86,13 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-    if (canPickBall && collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
-    {
-        PickBall(collision.gameObject.GetComponent<Dodgeball>());
-    }
+        if (canPickBall && collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
+        {
+            PickBall(collision.gameObject.GetComponent<Dodgeball>());
+        }
     }
 
-    private void PickBall(Dodgeball dodgeball)
+    public void PickBall(Dodgeball dodgeball)
     {
         currentDodgeball = dodgeball;
         currentDodgeball.transform.SetParent(transform);
@@ -122,8 +133,12 @@ public class Player : MonoBehaviour
     canPickBall = true;
     }
 
-    void Die()
+    public void Die()
     {
-        Destroy(gameObject);
+        transform.position = outOfGame.transform.position;
+        moveSpeed = 0;
+        playerRigidbody.useGravity = false;
+        GetComponent<BoxCollider>().enabled = false;
+        GameManager.Instance.RestartGame();
     }
 }
