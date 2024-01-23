@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private Dodgeball currentDodgeball;
     private Vector3 moveInput;
     private Vector3 throwDirection;
+    public Transform ballHolder;
     private bool canPickBall = true;
     private bool isCharging = false;
     private bool HaveDodgeball = false;
@@ -76,7 +77,6 @@ public class Player : MonoBehaviour
         newPosition.x = Mathf.Clamp(newPosition.x, floorBounds.min.x, floorBounds.max.x);
         newPosition.z = Mathf.Clamp(newPosition.z, floorBounds.min.z, floorBounds.max.z);
 
-
         transform.position = newPosition;
 
         if (isCharging)
@@ -109,7 +109,10 @@ public class Player : MonoBehaviour
     {
         HaveDodgeball = true;
         currentDodgeball = dodgeball;
-        currentDodgeball.transform.SetParent(transform);
+        Rigidbody dodgeballRb = dodgeball.GetComponent<Rigidbody>();
+        dodgeballRb.isKinematic = true;
+        currentDodgeball.transform.SetParent(ballHolder);
+        currentDodgeball.transform.position = ballHolder.position;
         throwForce = 10;
     }
 
@@ -127,6 +130,7 @@ public class Player : MonoBehaviour
     {
     if (currentDodgeball != null)
         {
+            currentDodgeball.GetComponent<Rigidbody>().isKinematic = false;
             currentDodgeball.transform.SetParent(null);
             currentDodgeball.Throw(new Vector3(0, 0.2f, -1), throwForce, gameObject);
             currentDodgeball = null;
@@ -139,8 +143,6 @@ public class Player : MonoBehaviour
             isCharging = false;
         }
     }
-
-   // void OpenMenu()
 
     private IEnumerator EnablePickBallAfterDelay()
     {

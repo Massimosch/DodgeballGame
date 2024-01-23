@@ -6,6 +6,8 @@ public class Dodgeball : MonoBehaviour
 {
     private DodgeballDamage damageScript;
     [SerializeField] Rigidbody rb;
+    [SerializeField] public bool thrownByPlayer = false;
+    [SerializeField] public bool thrownByEnemy = false;
 
     void Start()
     {
@@ -16,10 +18,22 @@ public class Dodgeball : MonoBehaviour
 
     public void Throw(Vector3 direction, float force, GameObject thrower)
     {
+        if (thrower.CompareTag("Player"))
+        {
+            thrownByPlayer = true;
+            thrownByEnemy = false;
+        }
+        else if (thrower.CompareTag("Enemy"))
+        {
+            thrownByPlayer = false;
+            thrownByEnemy = true;
+        }
+
         damageScript.SetThrower(thrower);
         damageScript.enabled = true;
         rb.AddForce(direction * force, ForceMode.VelocityChange);
     }
+
 
     void OnCollisionEnter(Collision collision)
     {
