@@ -6,7 +6,7 @@ public class MiddleLine : MonoBehaviour
 {
     [SerializeField] private GameObject EnemyOutOfGamePos;
     [SerializeField] private GameObject PlayerOutOfGamePos;
-    [SerializeField] private bool isLineDeadly = false;
+    [SerializeField] public bool isLineDeadly = false;
     public Player player;
 
     public void SetLineDeadly(bool isDeadly)

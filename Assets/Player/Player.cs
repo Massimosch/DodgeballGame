@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     [SerializeField] Rigidbody playerRigidbody;
     [SerializeField] private GameObject outOfGame;
     [SerializeField] private Vector3 startingPosition;
+    [SerializeField] private MiddleLine middleLine;
     private PlayerControls controls;
     private GameManager gameManager;
     public Dodgeball dodgeballPrefab;
@@ -57,13 +58,6 @@ public class Player : MonoBehaviour
         controls.Disable();
     }
 
-    public void Move(float moveHorizontal, float moveVertical)
-    {
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        movement = movement.normalized * moveSpeed * Time.deltaTime;
-        playerRigidbody.MovePosition(transform.position + movement);
-    }
-
     void Update()
     {
 
@@ -100,10 +94,6 @@ public class Player : MonoBehaviour
             PickBall(collision.gameObject.GetComponent<Dodgeball>());
         }
     }
-    public bool HasDodgeball
-    {
-        get { return HaveDodgeball; }
-    }
 
     public void PickBall(Dodgeball dodgeball)
     {
@@ -116,9 +106,19 @@ public class Player : MonoBehaviour
         throwForce = 10;
     }
 
+    public bool HasDodgeball
+    {
+        get { return HaveDodgeball; }
+    }
 
     void StartCharging()
     {
+        if (!middleLine.isLineDeadly)
+        {
+            Debug.Log("Cannot start charging because the ball is not activated at PlayerLine.");
+            return;
+        }
+
         if (currentDodgeball != null)
         {
             isCharging = true;
@@ -128,6 +128,14 @@ public class Player : MonoBehaviour
 
     public void ThrowBall()
     {
+    
+    
+    if (!middleLine.isLineDeadly)
+        {
+            Debug.Log("Cannot throw because the ball is not activated at PlayerLine.");
+            return;
+        }
+
     if (currentDodgeball != null)
         {
             currentDodgeball.GetComponent<Rigidbody>().isKinematic = false;
