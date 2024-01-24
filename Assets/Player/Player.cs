@@ -9,18 +9,21 @@ public class Player : MonoBehaviour
     [SerializeField] private Slider powerBar;
     [SerializeField] Rigidbody playerRigidbody;
     [SerializeField] private GameObject outOfGame;
-    [SerializeField] private PlayerControls controls;
     [SerializeField] private Vector3 startingPosition;
+    private PlayerControls controls;
+    private GameManager gameManager;
     public Dodgeball dodgeballPrefab;
     private Dodgeball currentDodgeball;
     private Vector3 moveInput;
     private Vector3 throwDirection;
+    public Transform ballHolder;
+    private bool canPickBall = true;
+    private bool isCharging = false;
+    private bool HaveDodgeball = false;
     public float throwForce = 10f;
     public float moveSpeed = 10.0f;
-
-    private bool canPickBall = true;
     private float pickBallDelay = 1.0f;
-    private bool isCharging = false;
+
 
 
 
@@ -31,7 +34,7 @@ public class Player : MonoBehaviour
         controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector3>();
         controls.Player.Throw.started += ctx => StartCharging();
         controls.Player.Throw.canceled += ctx => ThrowBall();
-      //  controls.Player.OpenMenu.performed += ctx => OpenMenu();
+        //controls.Player.OpenMenu.performed += ctx => OpenMenu();
     }
 
     private void Init()
@@ -41,7 +44,7 @@ public class Player : MonoBehaviour
         gameFloor = GameObject.Find("Floor");
         outOfGame = GameObject.Find("PlayerOutOfGamePos");
         transform.position = startingPosition;
-        // gameManager = FindObjectOfType<GameManager>();
+        gameManager = FindObjectOfType<GameManager>();
     }
 
     void OnEnable()
@@ -52,6 +55,13 @@ public class Player : MonoBehaviour
     void OnDisable()
     {
         controls.Disable();
+    }
+
+    public void Move(float moveHorizontal, float moveVertical)
+    {
+        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        movement = movement.normalized * moveSpeed * Time.deltaTime;
+        playerRigidbody.MovePosition(transform.position + movement);
     }
 
     void Update()
@@ -66,7 +76,6 @@ public class Player : MonoBehaviour
         // Use Clamp to ensure that the x and z positions stay within the corners
         newPosition.x = Mathf.Clamp(newPosition.x, floorBounds.min.x, floorBounds.max.x);
         newPosition.z = Mathf.Clamp(newPosition.z, floorBounds.min.z, floorBounds.max.z);
-
 
         transform.position = newPosition;
 
@@ -91,13 +100,22 @@ public class Player : MonoBehaviour
             PickBall(collision.gameObject.GetComponent<Dodgeball>());
         }
     }
+    public bool HasDodgeball
+    {
+        get { return HaveDodgeball; }
+    }
 
     public void PickBall(Dodgeball dodgeball)
     {
+        HaveDodgeball = true;
         currentDodgeball = dodgeball;
-        currentDodgeball.transform.SetParent(transform);
+        Rigidbody dodgeballRb = dodgeball.GetComponent<Rigidbody>();
+        dodgeballRb.isKinematic = true;
+        currentDodgeball.transform.SetParent(ballHolder);
+        currentDodgeball.transform.position = ballHolder.position;
         throwForce = 10;
     }
+
 
     void StartCharging()
     {
@@ -112,20 +130,19 @@ public class Player : MonoBehaviour
     {
     if (currentDodgeball != null)
         {
+            currentDodgeball.GetComponent<Rigidbody>().isKinematic = false;
             currentDodgeball.transform.SetParent(null);
             currentDodgeball.Throw(new Vector3(0, 0.2f, -1), throwForce, gameObject);
             currentDodgeball = null;
 
+            HaveDodgeball = false;
             canPickBall = false;
             StartCoroutine(EnablePickBallAfterDelay());
 
             powerBar.gameObject.SetActive(false);
-
             isCharging = false;
         }
     }
-
-   // void OpenMenu()
 
     private IEnumerator EnablePickBallAfterDelay()
     {

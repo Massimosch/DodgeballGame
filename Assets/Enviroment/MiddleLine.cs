@@ -6,11 +6,17 @@ public class MiddleLine : MonoBehaviour
 {
     [SerializeField] private GameObject EnemyOutOfGamePos;
     [SerializeField] private GameObject PlayerOutOfGamePos;
+    [SerializeField] private bool isLineDeadly = false;
     public Player player;
+
+    public void SetLineDeadly(bool isDeadly)
+    {
+        isLineDeadly = isDeadly;
+    }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Player") && isLineDeadly)
         {
             player.Die();
         }

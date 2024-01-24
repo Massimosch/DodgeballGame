@@ -2,9 +2,16 @@ using UnityEngine;
 
 public class DodgeballDamage : MonoBehaviour
 {
-    private GameObject thrower; // Säilytetään tieto siitä, kuka heitti pallon
+    private GameObject thrower;
+    private Dodgeball dodgeballScript;
+
     public Transform outOfGamePosition;
     private static float xOffset = 0f;
+
+    void Start()
+    {
+        dodgeballScript = GetComponent<Dodgeball>();
+    }
 
     public void SetThrower(GameObject thrower)
     {
@@ -29,7 +36,8 @@ public class DodgeballDamage : MonoBehaviour
 
     void HandleWallHit()
     {
-        Destroy(gameObject);
+        dodgeballScript.thrownByPlayer = false;
+        dodgeballScript.thrownByEnemy = false;
     }
 
     void HandlePlayerHit(GameObject player)
@@ -42,9 +50,12 @@ public class DodgeballDamage : MonoBehaviour
 
     void HandleEnemyHit(GameObject enemy)
     {
-        Vector3 newPosition = outOfGamePosition.position;
-        newPosition.x -= xOffset;
-        enemy.transform.position = newPosition;
-        xOffset += 1.5f;
+        if (dodgeballScript.thrownByPlayer)
+        {
+            Vector3 newPosition = outOfGamePosition.position;
+            newPosition.x -= xOffset;
+            xOffset += 1.5f;
+            enemy.transform.position = newPosition;
+        }
     }
 }
