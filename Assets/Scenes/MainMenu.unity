@@ -433,6 +433,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Controls
       objectReference: {fileID: 0}
+    - target: {fileID: 1984244214645113680, guid: c018f450e907564419c53bc3f31af9f2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2361925541898193712, guid: c018f450e907564419c53bc3f31af9f2, type: 3}
       propertyPath: m_Pivot.x
       value: 0
