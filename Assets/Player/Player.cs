@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject outOfGame;
     [SerializeField] private Vector3 startingPosition;
     [SerializeField] private MiddleLine middleLine;
+    // private Animator animator;
     private PlayerControls controls;
     private GameManager gameManager;
     public Dodgeball dodgeballPrefab;
@@ -48,6 +49,7 @@ public class Player : MonoBehaviour
 
     private void Init()
     {
+        //animator = GetComponent<Animator>();
         controls = new PlayerControls();
         playerRigidbody = GetComponent<Rigidbody>();
         gameFloor = GameObject.Find("Floor");
@@ -68,7 +70,21 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        HandleMovement();
+        HandleCharging();
+    }
 
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (canPickBall && collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
+        {
+            PickBall(collision.gameObject.GetComponent<Dodgeball>());
+        }
+    }
+
+    void HandleMovement()
+    {
         Vector3 movement = new Vector3(moveInput.x, 0, moveInput.z);
         Vector3 newPosition = transform.position + movement * moveSpeed * Time.deltaTime;
 
@@ -81,26 +97,8 @@ public class Player : MonoBehaviour
 
         transform.position = newPosition;
 
-        if (isCharging)
-        {
-            // Nostetaan throwforcea ja clamp hoitaa sit 10-20 välillä forcea riippuu kauanko painetaan
-            throwForce = Mathf.Clamp(throwForce + Time.deltaTime * 50, 50, 100);
-
-            float normalizedThrowForce = (throwForce - 50) / 50;
-            powerBar.value = throwForce;
-            //Sliderin value on vaan yksi sain sen näin täyttymään suht kivasti ku jako floatiksi
-            powerBar.value = normalizedThrowForce;
-            powerBar.gameObject.SetActive(true);
-        }
-    }
-
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (canPickBall && collision.gameObject.CompareTag("Dodgeball") && currentDodgeball == null)
-        {
-            PickBall(collision.gameObject.GetComponent<Dodgeball>());
-        }
+        //animator.SetFloat("MoveX", moveInput.x);
+        //animator.SetFloat("MoveY", moveInput.z);
     }
 
     public void PickBall(Dodgeball dodgeball)
@@ -130,6 +128,21 @@ public class Player : MonoBehaviour
         if (currentDodgeball != null)
         {
             isCharging = true;
+        }
+    }
+
+    void HandleCharging()
+    {
+        if (isCharging)
+        {
+            // Nostetaan throwforcea ja clamp hoitaa sit 10-20 välillä forcea riippuu kauanko painetaan
+            throwForce = Mathf.Clamp(throwForce + Time.deltaTime * 50, 50, 100);
+
+            float normalizedThrowForce = (throwForce - 50) / 50;
+            powerBar.value = throwForce;
+            //Sliderin value on vaan yksi sain sen näin täyttymään suht kivasti ku jako floatiksi
+            powerBar.value = normalizedThrowForce;
+            powerBar.gameObject.SetActive(true);
         }
     }
 
@@ -166,7 +179,7 @@ public class Player : MonoBehaviour
     canPickBall = true;
     }
  
-    public void OnDodgeChanceValueChanged(float newDodgeChanceValue)
+    void OnDodgeChanceValueChanged(float newDodgeChanceValue)
     {
         if (!isUpdatingSlider && newDodgeChanceValue != DodgeChanceValue)
         {
@@ -199,7 +212,8 @@ public class Player : MonoBehaviour
             yield return new WaitForSeconds(returnTime);
         }
     }
-    public void Dodge()
+
+    void Dodge()
         {
             float dodgePhase = 1f;
             float randomNumber = UnityEngine.Random.value;
