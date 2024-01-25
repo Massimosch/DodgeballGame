@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private GameObject gameFloor;
     [SerializeField] private Slider powerBar;
+    [SerializeField] private Slider dodgeSlider;
     [SerializeField] Rigidbody playerRigidbody;
     [SerializeField] private GameObject outOfGame;
     [SerializeField] private Vector3 startingPosition;
@@ -21,9 +22,13 @@ public class Player : MonoBehaviour
     private bool canPickBall = true;
     private bool isCharging = false;
     private bool HaveDodgeball = false;
+    private bool isUpdatingSlider = false;
     public float throwForce = 10f;
     public float moveSpeed = 10.0f;
     private float pickBallDelay = 1.0f;
+    private float DodgeChanceValue = 0f;
+    private float MaxDodgeSliderValue = 1f;
+    private float DodgeSliderIncreaseAmount = 0.015f;
 
 
 
@@ -35,8 +40,11 @@ public class Player : MonoBehaviour
         controls.Player.Movement.performed += ctx => moveInput = ctx.ReadValue<Vector3>();
         controls.Player.Throw.started += ctx => StartCharging();
         controls.Player.Throw.canceled += ctx => ThrowBall();
+        controls.Player.Dodge.performed += ctx => Dodge();
+        StartCoroutine(IncreaseDodgeChanceOverTime());
         //controls.Player.OpenMenu.performed += ctx => OpenMenu();
     }
+
 
     private void Init()
     {
@@ -156,6 +164,89 @@ public class Player : MonoBehaviour
     {
     yield return new WaitForSeconds(pickBallDelay);
     canPickBall = true;
+    }
+ 
+    public void OnDodgeChanceValueChanged(float newDodgeChanceValue)
+    {
+        if (!isUpdatingSlider && newDodgeChanceValue != DodgeChanceValue)
+        {
+            StopIncreasingDodgeChance();
+            DodgeChanceValue = newDodgeChanceValue;
+            if (DodgeChanceValue < MaxDodgeSliderValue)
+            {
+                StartIncreasingDodgeChance();
+            }
+        }
+    }
+
+    private IEnumerator IncreaseDodgeChanceOverTime()
+    {
+        float increaseAmount = DodgeSliderIncreaseAmount;
+        float returnTime = 0.25f;
+        float overFiftyAmount = 0.005f;
+
+        while (DodgeChanceValue < MaxDodgeSliderValue)
+        {
+            if (DodgeChanceValue >= 0.5f)
+            {
+                increaseAmount = overFiftyAmount;
+            }
+
+            DodgeChanceValue += increaseAmount;
+            isUpdatingSlider = true;
+            dodgeSlider.value = DodgeChanceValue;
+            isUpdatingSlider = false;
+            yield return new WaitForSeconds(returnTime);
+        }
+    }
+    public void Dodge()
+        {
+            float dodgePhase = 1f;
+            float randomNumber = UnityEngine.Random.value;
+            Debug.Log("Dodgen Tapahtumiseen tarvitaan: " + randomNumber);
+            Debug.Log("Pelaajalla on " + DodgeChanceValue);
+
+                // jos randomnumber on vähemmän tai yht suurikuin dodgechance, dodgetaan
+                if (randomNumber <= DodgeChanceValue)
+                {
+                    Debug.Log("🎉🎉 DODGE ONNISTUI! 🏋️‍♂️🦤");
+                    GetComponent<BoxCollider>().enabled = false;
+                    playerRigidbody.useGravity = false;
+                    StartCoroutine(TurnOnColliderAfterDelay(dodgePhase)); // dodgen kesto aika?
+                }
+            // Resetoidaan dodge himmelit
+            DodgeChanceValue = 0f;
+            isUpdatingSlider = true;
+            dodgeSlider.value = DodgeChanceValue;
+            isUpdatingSlider = false;
+
+            StopIncreasingDodgeChance();
+
+            // aloita Dodgen Sliderin valuen increase kun dodgetila ohi
+            StartCoroutine(StartIncreasingDodgeChanceAfterDelay(dodgePhase));
+        }
+
+    private IEnumerator StartIncreasingDodgeChanceAfterDelay(float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            StartIncreasingDodgeChance();
+        }
+    private void StartIncreasingDodgeChance()
+        {
+            StartCoroutine(IncreaseDodgeChanceOverTime());
+        }
+
+    private void StopIncreasingDodgeChance()
+        {
+            StopCoroutine(IncreaseDodgeChanceOverTime());
+        }
+
+
+        private IEnumerator TurnOnColliderAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        GetComponent<BoxCollider>().enabled = true;
+        playerRigidbody.useGravity = true;
     }
 
     public void Die()
